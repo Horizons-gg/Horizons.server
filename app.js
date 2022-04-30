@@ -2,7 +2,8 @@
 //! Modules
 //!
 
-const config = require('./config.json')
+const fs = require('fs')
+const config = JSON.parse(fs.readFileSync('./config.json'))
 
 const os = require('os')
 const osUtils = require('os-utils')
@@ -135,9 +136,42 @@ async function Loop() {
 
 
     //!
-    //! DNS Registration
+    //! Dynamic DNS
     //!
 
-    
+    if (!config.cloudflare.record) return
 
-} setInterval(Loop, 1000 * 120), Loop()
+    const ddns = require("cloudflare-dynamic-dns")
+
+    const route = {
+        auth: {
+            email: config.cloudflare.email,
+            key: config.cloudflare.key
+        },
+        recordName: `${config.cloudflare.record}.${config.cloudflare.zone}`,
+        zoneName: config.cloudflare.zone
+    }
+
+    const wildcard = {
+        auth: {
+            email: config.cloudflare.email,
+            key: config.cloudflare.key
+        },
+        recordName: `*.${config.cloudflare.record}.${config.cloudflare.zone}`,
+        zoneName: config.cloudflare.zone
+    }
+
+    ddns.update(route, (err) => {
+        if (!err) return
+        console.log("An error occurred:")
+        console.log(err)
+    })
+
+    ddns.update(wildcard, (err) => {
+        if (!err) return
+        console.log("An error occurred:")
+        console.log(err)
+    })
+
+
+} setInterval(Loop, 1000 * 60), Loop()
