@@ -1,0 +1,21 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Horizons-gg/Node.git"
+  },
+  "author": "Jessica Lancelot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Horizons-gg/Node/issues"
+  },
+  "homepage": "https://github.com/Horizons-gg/Node#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "os-utils": "^0.0.14",
+    "systeminformation": "^5.11.14"
+  }
+}
