@@ -72,10 +72,12 @@ async function Loop() {
 
 
     //? Memory Statistics
-    Memory['free'] = parseFloat((os.freemem() / 1000000000).toFixed(2))
-    Memory['total'] = parseFloat((os.totalmem() / 1000000000).toFixed(2))
+    Memory['used'] = parseFloat(((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2))
+    Memory['total'] = parseFloat((os.totalmem() / 1024 / 1024 / 1024).toFixed(2))
     Memory['information'] = await si.mem().then(data => data)
     Memory['layout'] = await si.memLayout().then(data => data)
+
+    console.log(Memory.used, Memory.total)
 
 
     //? System Statistics
