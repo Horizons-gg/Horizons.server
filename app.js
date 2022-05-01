@@ -77,8 +77,6 @@ async function Loop() {
     Memory['information'] = await si.mem().then(data => data)
     Memory['layout'] = await si.memLayout().then(data => data)
 
-    console.log(Memory.used, Memory.total)
-
 
     //? System Statistics
     System['uptime'] = new Date(osUtils.sysUptime() * 1000).toISOString().substr(11, 8)
