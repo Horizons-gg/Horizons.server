@@ -60,7 +60,7 @@ async function Loop() {
 
 
     //? Latency
-    Network['latency'] = await si.inetLatency(config.ping)
+    Network['latency'] = await si.inetLatency(config.ping) || await si.inetLatency("1.1.1.1")
 
 
     //? CPU Statistics
@@ -175,4 +175,5 @@ async function Loop() {
     })
 
 
-} setInterval(Loop, 1000 * 60), Loop()
+}
+setInterval(Loop, 1000 * 60), Loop()
