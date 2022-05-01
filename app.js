@@ -36,6 +36,7 @@ app.listen(config.port, () => console.log(`Listening on port ${config.port}`))
 app.get('/', (req, res) => {
     res.json({
         IPv4: IPv4,
+        Location: config.location,
         Network: Network,
         CPU: CPU,
         Memory: Memory,
