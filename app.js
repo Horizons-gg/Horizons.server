@@ -3,6 +3,9 @@
 //!
 
 const fs = require('fs')
+const dns = require('dns')
+const { spawn } = require('child_process')
+
 const config = JSON.parse(fs.readFileSync('./config.json'))
 
 const os = require('os')
@@ -136,43 +139,67 @@ async function Loop() {
 
 
 
-    //!
-    //! Dynamic DNS
-    //!
+    // //!
+    // //! Dynamic DNS
+    // //!
 
-    if (!config.cloudflare.record) return
+    if (config.cloudflare.record) {
+        const ddns = require("cloudflare-dynamic-dns")
 
-    const ddns = require("cloudflare-dynamic-dns")
+        const route = {
+            auth: {
+                email: config.cloudflare.email,
+                key: config.cloudflare.key
+            },
+            recordName: `${config.cloudflare.record}.${config.cloudflare.zone}`,
+            zoneName: config.cloudflare.zone
+        }
 
-    const route = {
-        auth: {
-            email: config.cloudflare.email,
-            key: config.cloudflare.key
-        },
-        recordName: `${config.cloudflare.record}.${config.cloudflare.zone}`,
-        zoneName: config.cloudflare.zone
+        const wildcard = {
+            auth: {
+                email: config.cloudflare.email,
+                key: config.cloudflare.key
+            },
+            recordName: `*.${config.cloudflare.record}.${config.cloudflare.zone}`,
+            zoneName: config.cloudflare.zone
+        }
+
+        ddns.update(route, (err) => {
+            if (!err) return
+            console.log("An error occurred:")
+            console.log(err)
+        })
+
+        ddns.update(wildcard, (err) => {
+            if (!err) return
+            console.log("An error occurred:")
+            console.log(err)
+        })
     }
 
-    const wildcard = {
-        auth: {
-            email: config.cloudflare.email,
-            key: config.cloudflare.key
-        },
-        recordName: `*.${config.cloudflare.record}.${config.cloudflare.zone}`,
-        zoneName: config.cloudflare.zone
+
+
+    //!
+    //! Dynamic Firewall
+    //!
+
+    if (config.firewall) {
+
+        let Whitelist = []
+
+        config.firewall.forEach((domain, index) => {
+            dns.lookup(domain, (err, address, family) => {
+                if (err) console.log(`Failed to lookup "${domain}":\n`, err, '\n')
+                if (address) Whitelist.push(`${address}/32`)
+                if (index >= config.firewall.length - 1) SetFirewall()
+            })
+        })
+
+        function SetFirewall() {
+            spawn('cmd', ['netsh', 'advfirewall', 'firewall', 'set', 'rule', 'name="Active Directory Domain Controller - LDAP (UDP-In)"', 'new', `remoteip=${Whitelist.join(',')}`])
+        }
+
     }
-
-    ddns.update(route, (err) => {
-        if (!err) return
-        console.log("An error occurred:")
-        console.log(err)
-    })
-
-    ddns.update(wildcard, (err) => {
-        if (!err) return
-        console.log("An error occurred:")
-        console.log(err)
-    })
 
 
 }
