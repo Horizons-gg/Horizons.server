@@ -196,7 +196,10 @@ async function Loop() {
         })
 
         function SetFirewall() {
-            spawn('cmd', ['netsh', 'advfirewall', 'firewall', 'set', 'rule', 'name="Active Directory Domain Controller - LDAP (UDP-In)"', 'new', `remoteip=${Whitelist.join(',')}`])
+            spawn('powershell', [`netsh advfirewall firewall set rule name="Active Directory Domain Controller - LDAP (UDP-In)" new remoteip=${Whitelist.join(',')}`]).stdout.on('data', data => {
+                data = data.toString('utf8')
+                console.log(data)
+            })
         }
 
     }
